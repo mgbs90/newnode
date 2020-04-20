@@ -2,15 +2,28 @@ process.env.NODE_CONFIG_DIR = __dirname + '/config';
 
 const config = require('config');
 const User = require('./models/UserModel');
+const express = require('express');
+const _ = require('lodash');
+
+const app = express();
+app.use(express.json());
 
 console.log(config.get('level'));
 
-let newUser = new User({
-    fullName: 'ali gharebaghi',
-    email: 'gharebaghii82@gmail.com',
-    password: '123456'
+app.post('/api/users', (req, res) => {
+    let user = new User({
+        fullName: req.body.fullName,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    user.save().then((user) => {
+        res.status(200).send(user);
+    }, (err) => {
+        res.status(400).send(err);
+    });
 });
 
-newUser.save().then((user) => {
-    console.log(`this user is : ${user}`);
+app.listen(config.get('PORT'), () => {
+    console.log('server run in port 3000');
 });
